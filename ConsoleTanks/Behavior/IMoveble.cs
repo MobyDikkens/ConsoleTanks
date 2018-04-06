@@ -14,6 +14,7 @@ namespace ConsoleTanks.Behavior
         void MoveRight();
         void MoveUp();
         Directions GetCurrentDirection();
+        event System.EventHandler<Directions> Moved;
     }
 
 

@@ -10,5 +10,6 @@ namespace ConsoleTanks.Behavior
     {
         void Fire();
         int GetDamage();
+        event System.EventHandler<ConsoleTanks.Models.Objective.Bullet> OnShot;
     }
 }

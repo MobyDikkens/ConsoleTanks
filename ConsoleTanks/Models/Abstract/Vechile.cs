@@ -33,6 +33,7 @@ namespace ConsoleTanks.Models.Abstract
             this.skin = '^';
             this.HPChanged = null;
             this.direction = Directions.Up;
+            this.Moved = null;
         }
 
         public Vechile(int hp, char skin)
@@ -43,6 +44,7 @@ namespace ConsoleTanks.Models.Abstract
                 this.skin = skin;
                 this.HPChanged = null;
                 this.direction = Directions.Up;
+                this.Moved = null;
             }
             else
             {
@@ -50,6 +52,7 @@ namespace ConsoleTanks.Models.Abstract
                 this.skin = '^';
                 this.HPChanged = null;
                 this.direction = Directions.Up;
+                this.Moved = null;
             }
         }
 
@@ -97,24 +100,42 @@ namespace ConsoleTanks.Models.Abstract
 
         #region IMoveble
 
+        public event EventHandler<Directions> Moved = null;
+
         void IMoveble.MoveDown()
         {
-            this.direction = Directions.Down;
+            if (this.Moved != null)
+            {
+                this.direction = Directions.Down;
+                Moved(this, Directions.Down);
+            }
         }
 
         void IMoveble.MoveLeft()
         {
-            this.direction = Directions.Left;
+            if (this.Moved != null)
+            {
+                this.direction = Directions.Left;
+                Moved(this, Directions.Left);
+            }
         }
 
         void IMoveble.MoveRight()
         {
-            this.direction = Directions.Right;
+            if (this.Moved != null)
+            {
+                this.direction = Directions.Right;
+                Moved(this, Directions.Right);
+            }
         }
 
         void IMoveble.MoveUp()
         {
-            this.direction = Directions.Up;
+            if (this.Moved != null)
+            {
+                this.direction = Directions.Up;
+                Moved(this, Directions.Up);
+            }
         }
 
         public Directions GetCurrentDirection()
