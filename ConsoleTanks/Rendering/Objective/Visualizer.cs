@@ -28,14 +28,24 @@ namespace ConsoleTanks.Rendering.Objective
             }
         }
 
-        public char[,] GetVisualization()
+        public void Visualize()
         {
-            return this.visualMap;
+            for(int i = 0; i < xLenth; i++)
+            {
+                for(int j = 0; j < yLenth; j++)
+                {
+                    System.Console.Write(visualMap[i,j]);
+                }
+                System.Console.WriteLine();
+            }
+            Clear();
         }
 
-        public void Clear()
+        private void Clear()
         {
             this.visualMap = null;
+            this.xLenth = 0;
+            this.yLenth = 0;
         }
 
     }

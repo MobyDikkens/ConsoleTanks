@@ -11,5 +11,6 @@ namespace ConsoleTanks.Rendering
     {
         void RenderMap(char[,] map, int xLenth, int yLenth);
         void RenderObject(char skin, int x, int y);
+        void Visualize();
     }
 }

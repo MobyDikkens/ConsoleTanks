@@ -45,12 +45,15 @@
     <Compile Include="Behavior\IAliveble.cs" />
     <Compile Include="Behavior\IFireble.cs" />
     <Compile Include="Behavior\IMoveble.cs" />
+    <Compile Include="Controllers\GameController.cs" />
     <Compile Include="Models\Abstract\Vechile.cs" />
     <Compile Include="Models\Objective\Bullet.cs" />
     <Compile Include="Models\Objective\Map.cs" />
     <Compile Include="Models\Objective\Tank.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rendering\Abstract\IVisualization.cs" />
+    <Compile Include="Rendering\Objective\Visualizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
