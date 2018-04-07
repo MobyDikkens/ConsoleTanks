@@ -42,6 +42,22 @@ namespace ConsoleTanks.Models.Objective
             return this.map;
         }
 
+        public bool IsEmpty(int x, int y)
+        {
+            if((x < xLenth) && (x >= 0)
+                && (y < yLenth) && (y >= 0))
+            {
+                if(map[x,y] == ' ')
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        #region Helpers
+
         private void FillBounds()
         {
             //  top and bottom horizontal bounds
@@ -70,6 +86,7 @@ namespace ConsoleTanks.Models.Objective
             }
         }
 
+        #endregion
 
 
     }
