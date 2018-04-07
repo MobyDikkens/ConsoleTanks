@@ -1,4 +1,12 @@
-﻿using ConsoleTanks.Models.Abstract;
+﻿/*  Tank
+ *  
+ *  An class
+ *  that descibes
+ *  objective tank
+ */
+
+
+using ConsoleTanks.Models.Abstract;
 using ConsoleTanks.Behavior;
 using System;
 
