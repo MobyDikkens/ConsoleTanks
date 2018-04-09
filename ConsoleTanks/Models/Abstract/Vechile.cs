@@ -62,37 +62,37 @@ namespace ConsoleTanks.Models.Abstract
 
         #region IAliveble
 
-        public event EventHandler HPChanged = null;
+        public event EventHandler<int> HPChanged = null;
 
-        int IAliveble.GetHP()
+        public int GetHP()
         {
             return this.hp;
         }
 
-        void IAliveble.HPDecrement()
+        public void HPDecrement()
         {
             if (this.HPChanged != null)
             {
                 this.hp--;
-                HPChanged(this, new EventArgs());
+                HPChanged(this, this.hp);
             }
         }
 
-        void IAliveble.HPImprove(int value)
+        public void HPImprove(int value)
         {
             if (this.HPChanged != null)
             {
                 this.hp += value;
-                HPChanged(this, new EventArgs());
+                HPChanged(this, this.hp);
             }
         }
 
-        void IAliveble.HPIncrement()
+        public void HPIncrement()
         {
             if (this.HPChanged != null)
             {
                 this.hp++;
-                HPChanged(this, new EventArgs());
+                HPChanged(this, this.hp);
             }
         }
 
@@ -102,7 +102,7 @@ namespace ConsoleTanks.Models.Abstract
 
         public event EventHandler<Directions> Moved = null;
 
-        void IMoveble.MoveDown()
+        public void MoveDown()
         {
             if (this.Moved != null)
             {
@@ -111,7 +111,7 @@ namespace ConsoleTanks.Models.Abstract
             }
         }
 
-        void IMoveble.MoveLeft()
+        public void MoveLeft()
         {
             if (this.Moved != null)
             {
@@ -120,7 +120,7 @@ namespace ConsoleTanks.Models.Abstract
             }
         }
 
-        void IMoveble.MoveRight()
+        public void MoveRight()
         {
             if (this.Moved != null)
             {
@@ -129,7 +129,7 @@ namespace ConsoleTanks.Models.Abstract
             }
         }
 
-        void IMoveble.MoveUp()
+        public void MoveUp()
         {
             if (this.Moved != null)
             {

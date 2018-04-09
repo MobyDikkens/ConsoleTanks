@@ -12,7 +12,7 @@ namespace ConsoleTanks.Behavior
         void HPDecrement();
         void HPIncrement();
         void HPImprove(int value);
-        event System.EventHandler HPChanged;
+        event System.EventHandler<int> HPChanged;
     }
 
 }
