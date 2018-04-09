@@ -8,6 +8,7 @@ using ConsoleTanks.Models.Abstract;
 using ConsoleTanks.Rendering.Objective;
 using System.Collections.Generic;
 using ConsoleTanks.Behavior;
+using System.Timers;
 
 namespace ConsoleTanks.Controllers
 {
@@ -33,6 +34,10 @@ namespace ConsoleTanks.Controllers
         //  <bullet id, bullet>
         private Dictionary<int, BulletOnMap> bulletsCollection = null;
 
+        private Timer timer = null;
+
+        Visualizer Visualizer = new Visualizer();
+
         #region Constructor
 
         public GameController(int xLenth, int yLenth, char wall)
@@ -40,13 +45,80 @@ namespace ConsoleTanks.Controllers
             if ((xLenth > 0) && (yLenth > 0) && (wall != ' '))
             {
                 this.tanksCollection = new Dictionary<int, TankOnMap>();
+                this.bulletsCollection = new Dictionary<int, BulletOnMap>();
                 this.map = new Map(xLenth, yLenth, wall);
+
+
+                timer = new Timer(41);//24 fps
+                timer.AutoReset = true;
+                timer.Elapsed += TimerElapsed;
+
             }
             else
             {
                 this.tanksCollection = new Dictionary<int, TankOnMap>();
+                this.bulletsCollection = new Dictionary<int, BulletOnMap>();
                 this.map = new Map(20, 20, '*');
+
+                timer = new Timer(41);//24 fps
+                timer.AutoReset = true;
+                timer.Elapsed += TimerElapsed;
             }
+        }
+
+
+
+        #endregion
+
+
+
+        #region Timer Handler
+
+        private void TimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            
+            foreach(var bullet in bulletsCollection)
+            {
+                //  check if bullet intersects with an object
+                //  if true decrement hp and remove bullet
+                foreach (var tank in tanksCollection)
+                {
+                    if((bullet.Value.Position.X == tank.Value.Position.X)
+                        && (bullet.Value.Position.Y == tank.Value.Position.Y))
+                    {
+                        tank.Value.Tank.HPImprove((-1) * bullet.Value.Bullet.GetDamage());
+                        bulletsCollection.Remove(bullet.Key);
+                    }
+
+                }
+
+                //  chech if bullet intersects with a wall
+                //  if true then remove
+                if(!map.IsEmpty(bullet.Value.Position.X, bullet.Value.Position.Y))
+                {
+                    bulletsCollection.Remove(bullet.Key);
+                }
+
+            }
+
+
+            //  render map
+            Visualizer.RenderMap(map.GetMap(), map.xLenth, map.yLenth);
+
+            //  render tanks
+            foreach (var tank in tanksCollection)
+            {
+                Visualizer.RenderObject(tank.Value.Tank.GetSkin(), tank.Value.Position.X, tank.Value.Position.Y);
+            }
+
+            //  render bullets
+            foreach(var bullet in bulletsCollection)
+            {
+                Visualizer.RenderObject(bullet.Value.Bullet.GetSkin(), bullet.Value.Position.X, bullet.Value.Position.Y);
+            }
+
+            Visualizer.Visualize();
+
         }
 
         #endregion
@@ -105,6 +177,30 @@ namespace ConsoleTanks.Controllers
 
         private void OnShotHandler(object sender, Directions direction)
         {
+            Tank tank = sender as Tank;
+
+            if(tank != null)
+            {
+                Bullet bullet = new Bullet(tank.GetHashCode(), tank.GetDamage(), tank.GetBulletSkin(), tank.GetCurrentDirection());
+
+
+                foreach(var tmp in tanksCollection)
+                {
+                    if(tmp.Key == tank.GetHashCode())
+                    {
+                        Position bulletPosition = new Position();
+
+                        GetDesirePosition(ref bulletPosition, tank, direction);
+
+                        BulletOnMap newBullet = new BulletOnMap();
+                        newBullet.Bullet = bullet;
+                        newBullet.Position = bulletPosition;
+                        bulletsCollection.Add(tmp.Key, newBullet);
+
+                    }
+                }
+
+            }
 
         }
 

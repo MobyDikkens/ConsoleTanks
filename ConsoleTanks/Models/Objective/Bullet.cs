@@ -17,12 +17,15 @@ namespace ConsoleTanks.Models.Objective
 
         private Directions direction = Directions.Up;
 
+        private char skin = '*';
 
-        public Bullet(int id, int damage, Directions direction)
+
+        public Bullet(int id, int damage, char skin, Directions direction)
         {
             this.id = id;
             this.damage = damage;
             this.direction = direction;
+            this.skin = skin;
         }
 
         public override int GetHashCode()
@@ -38,6 +41,11 @@ namespace ConsoleTanks.Models.Objective
         public Directions GetDirection()
         {
             return this.direction;
+        }
+
+        public char GetSkin()
+        {
+            return this.skin;
         }
 
     }

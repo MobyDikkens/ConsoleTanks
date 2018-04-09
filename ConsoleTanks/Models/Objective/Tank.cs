@@ -39,6 +39,13 @@ namespace ConsoleTanks.Models.Objective
             }
         }
 
+
+        public char GetBulletSkin()
+        {
+            return this.bulletSkin;
+        }
+
+
         #region IFireble
 
         public void Fire()
@@ -51,7 +58,7 @@ namespace ConsoleTanks.Models.Objective
                 if (delta.Milliseconds >= 5000)
                 {
 
-                    Bullet bullet = new Bullet(this.id, this.damage, this.GetCurrentDirection());
+                    Bullet bullet = new Bullet(this.id, this.damage, this.bulletSkin, this.GetCurrentDirection());
                     OnShot(this, bullet);
                 }
             }
@@ -61,6 +68,7 @@ namespace ConsoleTanks.Models.Objective
         {
             return this.damage;
         }
+
 
         #endregion
 
