@@ -9,6 +9,8 @@ using ConsoleTanks.Rendering.Objective;
 using System.Collections.Generic;
 using ConsoleTanks.Behavior;
 using System.Timers;
+using System.Threading.Tasks;
+
 
 namespace ConsoleTanks.Controllers
 {
@@ -36,7 +38,8 @@ namespace ConsoleTanks.Controllers
 
         private Timer timer = null;
 
-        Visualizer Visualizer = new Visualizer();
+        private PlayerController playerController = null;
+
 
         #region Constructor
 
@@ -60,64 +63,120 @@ namespace ConsoleTanks.Controllers
                 this.bulletsCollection = new Dictionary<int, BulletOnMap>();
                 this.map = new Map(20, 20, '*');
 
-                timer = new Timer(41);//24 fps
+                timer = new Timer(36);//24 fps
                 timer.AutoReset = true;
                 timer.Elapsed += TimerElapsed;
             }
+
+            
+            Visualizer.Render(map.GetMap(), map.xLenth, map.yLenth, System.ConsoleColor.Red);
         }
 
 
 
         #endregion
 
+        #region Player Controller Handler
 
+        private void OnKeyPressed(object sender, KeyPressedState type)
+        {
+            var tank = sender as Tank;
+            if (tank != null && tanksCollection.ContainsKey(tank.GetHashCode()))
+            {
+                var tmp = tanksCollection[tank.GetHashCode()];
+
+                switch (type)
+                {
+                    case KeyPressedState.Backward: { tmp.Tank.MoveDown(); break; }
+                    case KeyPressedState.Foreward: { tmp.Tank.MoveUp(); break; }
+                    case KeyPressedState.Left: { tmp.Tank.MoveLeft(); break; }
+                    case KeyPressedState.Right: { tmp.Tank.MoveRight(); break; }
+                    case KeyPressedState.Shout: { tmp.Tank.Fire(); break; }
+                }
+            }
+        }
+
+        #endregion
 
         #region Timer Handler
 
-        private void TimerElapsed(object sender, ElapsedEventArgs e)
+        private async void TimerElapsed(object sender, ElapsedEventArgs e)
         {
-            
-            foreach(var bullet in bulletsCollection)
+            if (bulletsCollection.Count > 0)
             {
-                //  check if bullet intersects with an object
-                //  if true decrement hp and remove bullet
-                foreach (var tank in tanksCollection)
+
+                await Task.Run(() =>
                 {
-                    if((bullet.Value.Position.X == tank.Value.Position.X)
-                        && (bullet.Value.Position.Y == tank.Value.Position.Y))
+
+                    foreach (var bullet in bulletsCollection)
                     {
-                        tank.Value.Tank.HPImprove((-1) * bullet.Value.Bullet.GetDamage());
-                        bulletsCollection.Remove(bullet.Key);
+                    //  check if bullet intersects with an object
+                    //  if true decrement hp and remove bullet
+                    foreach (var tank in tanksCollection)
+                        {
+                            if ((bullet.Value.Position.X == tank.Value.Position.X)
+                                && (bullet.Value.Position.Y == tank.Value.Position.Y)
+                                && (bullet.Key != tank.Key))
+                            {
+                                tank.Value.Tank.HPImprove((-1) * bullet.Value.Bullet.GetDamage());
+
+                            //  delete bullet from the map
+                            Visualizer.Render(' ', bullet.Value.Position.X, bullet.Value.Position.Y, System.Console.BackgroundColor);
+
+                                bulletsCollection.Remove(bullet.Key);
+                            }
+
+                        }
+
+                    //  change the bullet position and render it
+                    //**
+                    //  delete bullet from the map
+                    Visualizer.Render(' ', bullet.Value.Position.X, bullet.Value.Position.Y, System.Console.BackgroundColor);
+                        BulletOnMap tmp = bullet.Value;
+
+                        switch (bullet.Value.Bullet.GetDirection())
+                        {
+
+                            case Directions.Down:
+                                {
+                                    tmp.Position.Y--; break;
+                                }
+                            case Directions.Up:
+                                {
+                                    tmp.Position.Y++; break;
+                                }
+                            case Directions.Right:
+                                {
+                                    tmp.Position.X++; break;
+                                }
+                            case Directions.Left:
+                                {
+                                    tmp.Position.X--; break;
+                                }
+
+                        }
+
+                        bulletsCollection[bullet.Key] = tmp;
+
+                        Visualizer.Render(tmp.Bullet.GetSkin(), bullet.Value.Position.X, bullet.Value.Position.Y, System.Console.BackgroundColor);
+                    //**
+
+
+
+
+                    //  chech if bullet intersects with a wall
+                    //  if true then remove
+                    if (!map.IsEmpty(bullet.Value.Position.X, bullet.Value.Position.Y))
+                        {
+                        //  delete bullet from the map
+                        Visualizer.Render(' ', bullet.Value.Position.X, bullet.Value.Position.Y, System.Console.BackgroundColor);
+                            bulletsCollection.Remove(bullet.Key);
+                        }
+
                     }
-
-                }
-
-                //  chech if bullet intersects with a wall
-                //  if true then remove
-                if(!map.IsEmpty(bullet.Value.Position.X, bullet.Value.Position.Y))
-                {
-                    bulletsCollection.Remove(bullet.Key);
-                }
+                });
 
             }
-
-
-            //  render map
-            Visualizer.RenderMap(map.GetMap(), map.xLenth, map.yLenth);
-
-            //  render tanks
-            foreach (var tank in tanksCollection)
-            {
-                Visualizer.RenderObject(tank.Value.Tank.GetSkin(), tank.Value.Position.X, tank.Value.Position.Y);
-            }
-
-            //  render bullets
-            foreach(var bullet in bulletsCollection)
-            {
-                Visualizer.RenderObject(bullet.Value.Bullet.GetSkin(), bullet.Value.Position.X, bullet.Value.Position.Y);
-            }
-
-            Visualizer.Visualize();
 
         }
 
@@ -125,7 +184,9 @@ namespace ConsoleTanks.Controllers
 
         #region Methods
 
-        public bool AddTank(int damage, char bulletSkin, int hp, char skin)
+        public bool AddPlayer(int damage, char bulletSkin, int hp, char skin, 
+            System.ConsoleKey foreward, System.ConsoleKey backward, System.ConsoleKey left,
+            System.ConsoleKey right, System.ConsoleKey shout)
         {
             if((bulletSkin != ' ') && (hp > 0) && (skin != ' '))
             {
@@ -159,8 +220,17 @@ namespace ConsoleTanks.Controllers
                     }
                 }
 
+                //  add event handlers
+                newTank.Tank.OnShot += OnShotHandler;
+                newTank.Tank.Moved += OnMoveHandler;
+                newTank.Tank.HPChanged += OnHPCHangedHandler;
+
                 //  add to the collection
                 tanksCollection.Add(guid, newTank);
+                playerController = new PlayerController(foreward, backward, right, left, shout);
+                playerController.Tank = newTank.Tank;
+                playerController.KeyPressed += OnKeyPressed;
+                
 
                 return true;
             }
@@ -170,19 +240,24 @@ namespace ConsoleTanks.Controllers
             }
         }
 
+        public void Start()
+        {
+            this.playerController.Run();
+            this.timer.Start();
+            //task.Wait();
+        }
+
         #endregion
 
         #region Event Handlers
 
 
-        private void OnShotHandler(object sender, Directions direction)
+        private void OnShotHandler(object sender, Bullet bullet)
         {
             Tank tank = sender as Tank;
 
             if(tank != null)
             {
-                Bullet bullet = new Bullet(tank.GetHashCode(), tank.GetDamage(), tank.GetBulletSkin(), tank.GetCurrentDirection());
-
 
                 foreach(var tmp in tanksCollection)
                 {
@@ -190,7 +265,7 @@ namespace ConsoleTanks.Controllers
                     {
                         Position bulletPosition = new Position();
 
-                        GetDesirePosition(ref bulletPosition, tank, direction);
+                        GetDesirePosition(ref bulletPosition, tank, bullet.GetDirection());
 
                         BulletOnMap newBullet = new BulletOnMap();
                         newBullet.Bullet = bullet;
@@ -227,7 +302,7 @@ namespace ConsoleTanks.Controllers
                         if (map.IsEmpty(desirePosition.X, desirePosition.Y))
                         {
                             //  if desire position doesnt intersects with ohther tanks
-                            if(!IntersectsWithObjects(desirePosition.X, desirePosition.Y))
+                            if(!IntersectsWithObjects(tank, desirePosition.X, desirePosition.Y))
                             {
                                 //  if desire position intersects with the bullet
                                 foreach(var bullet in bulletsCollection)
@@ -245,21 +320,33 @@ namespace ConsoleTanks.Controllers
 
                                 //  so desire position is OK
                                 //  find the tank and change current position to desire
-                                foreach(var tmp in tanksCollection)
+                                
+
+                                if (tanksCollection.ContainsKey(tank.GetHashCode()))
                                 {
-                                    if(tmp.Key == tank.GetHashCode())
+                                    var tmp = tanksCollection[tank.GetHashCode()];
+
+                                    if (tmp.Tank.GetHashCode() == tank.GetHashCode())
                                     {
                                         TankOnMap newValue = new TankOnMap();
 
                                         newValue.Position.X = desirePosition.X;
                                         newValue.Position.Y = desirePosition.Y;
 
-                                        newValue.Tank = tmp.Value.Tank;
+                                        newValue.Tank = tmp.Tank;
 
+                                        //  Render
+                                        //  Delete old position from map
+                                        Visualizer.Render(' ', tmp.Position.X, tmp.Position.Y, System.Console.BackgroundColor);
+                                        //  Add new position
+                                        Visualizer.Render(newValue.Tank.GetSkin(), newValue.Position.X, newValue.Position.Y, System.ConsoleColor.Green);
 
-                                        tanksCollection[tmp.Key] = newValue;
+                                        tanksCollection[tmp.GetHashCode()] = newValue;
+
                                     }
+
                                 }
+
 
                             }
                         }
@@ -300,11 +387,11 @@ namespace ConsoleTanks.Controllers
 
         #region Helpers
 
-        private bool IntersectsWithObjects(int x, int y)
+        private bool IntersectsWithObjects(Tank sender, int x, int y)
         {
             foreach(var tank in tanksCollection)
             {
-                if((tank.Value.Position.X == x) && (tank.Value.Position.Y == y))
+                if((tank.Value.Position.X == x) && (tank.Value.Position.Y == y) && (tank.Key != sender.GetHashCode()))
                 {
                     return true;
                 }

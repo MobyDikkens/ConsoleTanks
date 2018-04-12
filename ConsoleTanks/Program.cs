@@ -7,17 +7,13 @@ namespace ConsoleTanks
     {
         static void Main(string[] args)
         {
-            Map map = new Map(-20, 20, '*');
-
-            var m = map.GetMap();
-            for(int i = 0; i < map.xLenth; i++)
-            {
-                for(int j = 0; j < map.yLenth; j++)
-                {
-                    Console.Write(m[i,j]);
-                }
-                Console.WriteLine();
-            }
+            Console.WindowHeight = 30;
+            Console.WindowWidth = 150;
+            
+            ConsoleTanks.Controllers.GameController gameController = new Controllers.GameController(30, 100, '*');
+            gameController.AddPlayer(5, '5', 100, '^', System.ConsoleKey.W, System.ConsoleKey.S, System.ConsoleKey.D, System.ConsoleKey.A, System.ConsoleKey.Spacebar);
+            gameController.Start();
+            System.Threading.Thread.Sleep(-1);
             Console.ReadKey();
         }
     }

@@ -46,6 +46,8 @@
     <Compile Include="Behavior\IFireble.cs" />
     <Compile Include="Behavior\IMoveble.cs" />
     <Compile Include="Controllers\GameController.cs" />
+    <Compile Include="Controllers\PlayerController.cs" />
+    <Compile Include="Exceptions\PlayerControllerException.cs" />
     <Compile Include="Models\Abstract\Vechile.cs" />
     <Compile Include="Models\Objective\Bullet.cs" />
     <Compile Include="Models\Objective\Map.cs" />

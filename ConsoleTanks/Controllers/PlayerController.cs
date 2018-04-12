@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Timers;
 
 namespace ConsoleTanks.Controllers
 {
@@ -19,11 +20,15 @@ namespace ConsoleTanks.Controllers
 
         private static List<ConsoleKey> globalReservedKeys = new List<ConsoleKey>();
 
+        public ConsoleTanks.Models.Objective.Tank Tank { get;  set; }
+
         public ConsoleKey Foreward { get; private set; }
         public ConsoleKey Backward { get; private set; }
         public ConsoleKey Right { get; private set; }
         public ConsoleKey Left { get; private set; }
         public ConsoleKey Shout { get; private set; }
+
+        public event EventHandler<KeyPressedState> KeyPressed = null;
 
         public PlayerController(ConsoleKey foreward, ConsoleKey backward, ConsoleKey right, ConsoleKey left, ConsoleKey shout)
         {
@@ -36,6 +41,8 @@ namespace ConsoleTanks.Controllers
                 }
 
             }
+
+            
 
             //  if we are here 
             //  the keys dont reserved and we doesnt
@@ -65,6 +72,85 @@ namespace ConsoleTanks.Controllers
             return this.id;
         }
 
+        public void Run()
+        {
+            System.Threading.Tasks.Task.Factory.StartNew(() =>
+            {
+                int duration = 0;
+                ConsoleKey previous = new ConsoleKey();
+                ConsoleKey current = new ConsoleKey();
+
+                while (true)
+                {
+                    duration = 0;
+
+                    previous = Console.ReadKey(true).Key;
+
+                    while(EqualsKey((Console.ReadKey(true).Key)))
+                    {
+                        current = Console.ReadKey(true).Key;
+
+                        if (current == previous)
+                        {
+                            if(duration >= 3)
+                            {
+                                CallKeyPressed(current);
+                                duration = 0;
+                                break;
+                            }
+                            else
+                            {
+                                duration++;
+                            }
+                        }
+                        
+                    }
+
+
+                }
+            });
+
+        }
+
+        private bool EqualsKey(ConsoleKey key)
+        {
+            return ((key == Foreward) || (key == Backward)
+                           || (key == Left) || (key == Right)
+                           || (key == Shout));
+
+        }
+
+        private void CallKeyPressed(ConsoleKey key)
+        {
+
+            if (key == Foreward)
+            {
+                KeyPressed(Tank, KeyPressedState.Foreward);
+                return;
+            }
+            if (key == Backward)
+            {
+                KeyPressed(Tank, KeyPressedState.Backward);
+                return;
+            }
+            if (key == Left)
+            {
+                KeyPressed(Tank, KeyPressedState.Left);
+                return;
+            }
+            if (key == Right)
+            {
+                KeyPressed(Tank, KeyPressedState.Right);
+                return;
+            }
+            if (key == Shout)
+            {
+                KeyPressed(Tank, KeyPressedState.Shout);
+                return;
+            }
+
+        }
+
 
         //  remove local keys from global reserved keys
         ~PlayerController()
@@ -76,6 +162,17 @@ namespace ConsoleTanks.Controllers
             globalReservedKeys.Remove(Shout);
         }
 
+
+
+    }
+
+    public enum KeyPressedState
+    {
+        Foreward,
+        Backward,
+        Left,
+        Right,
+        Shout
     }
 
 }
