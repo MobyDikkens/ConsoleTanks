@@ -55,7 +55,7 @@ namespace ConsoleTanks.Models.Objective
             {
                 TimeSpan delta = DateTime.Now - lastFire;
 
-                if (delta.Milliseconds >= 5000)
+                if (delta.Milliseconds >= 5)
                 {
 
                     Bullet bullet = new Bullet(this.id, this.damage, this.bulletSkin, this.GetCurrentDirection());

@@ -77,34 +77,38 @@ namespace ConsoleTanks.Controllers
             System.Threading.Tasks.Task.Factory.StartNew(() =>
             {
                 int duration = 0;
-                ConsoleKey previous = new ConsoleKey();
+                ConsoleKey previous = Console.ReadKey(true).Key;
                 ConsoleKey current = new ConsoleKey();
 
                 while (true)
                 {
-                    duration = 0;
+                    current = Console.ReadKey(true).Key;
 
-                    previous = Console.ReadKey(true).Key;
-
-                    while(EqualsKey((Console.ReadKey(true).Key)))
+                    if (current == previous)
                     {
-                        current = Console.ReadKey(true).Key;
 
-                        if (current == previous)
-                        {
-                            if(duration >= 3)
+                        if (duration >= 3)
+                            {
+                            if(EqualsKey(current))
                             {
                                 CallKeyPressed(current);
-                                duration = 0;
-                                break;
                             }
-                            else
-                            {
-                                duration++;
-                            }
+
+                            duration = 0;
                         }
-                        
+                        else
+                        {
+                            duration++;
+                        }
+
                     }
+                    else
+                    {
+                        duration = 0;
+                    }
+
+
+                    previous = current;
 
 
                 }
