@@ -40,9 +40,12 @@ namespace ConsoleTanks.Controllers
 
         private PlayerController playerController = null;
 
-
+        //  all right
         #region Constructor
 
+
+        //  basic initializations
+        //  parametrized constructor
         public GameController(int xLenth, int yLenth, char wall)
         {
             if ((xLenth > 0) && (yLenth > 0) && (wall != ' '))
@@ -76,8 +79,10 @@ namespace ConsoleTanks.Controllers
 
         #endregion
 
+        //  all right
         #region Player Controller Handler
 
+        //  player controll key pressed handler
         private void OnKeyPressed(object sender, KeyPressedState type)
         {
             var tank = sender as Tank;
@@ -98,89 +103,106 @@ namespace ConsoleTanks.Controllers
 
         #endregion
 
+        //  all right
         #region Timer Handler
 
-        private async void TimerElapsed(object sender, ElapsedEventArgs e)
+        //  called each time to controll bullets movement
+        private void TimerElapsed(object sender, ElapsedEventArgs e)
         {
             if (bulletsCollection.Count > 0)
             {
+                // to collect bullets and delete it after foreach
+                List<BulletOnMap> toDelete = new List<BulletOnMap>();
 
-                await Task.Run(() =>
+                //  to collect bullets and then change it in bulletsCollection
+                List<BulletOnMap> toChange = new List<BulletOnMap>();
+
+                foreach (var bullet in bulletsCollection)
                 {
-                    for (var bullet = bulletsCollection.GetEnumerator(); bullet.MoveNext() != false;)
+
+                    //  check if bullet intersects with an object
+                    //  if true decrement hp and remove bullet
+                    foreach (var tank in tanksCollection)
                     {
-                        
-                            //  check if bullet intersects with an object
-                            //  if true decrement hp and remove bullet
-                            foreach (var tank in tanksCollection)
-                            {
-                                if ((bullet.Current.Value.Position.X == tank.Value.Position.X)
-                                    && (bullet.Current.Value.Position.Y == tank.Value.Position.Y)
-                                    && (bullet.Current.Key != tank.Key))
-                                {
-                                    tank.Value.Tank.HPImprove((-1) * bullet.Current.Value.Bullet.GetDamage());
+                        if ((bullet.Value.Position.X == tank.Value.Position.X)
+                            && (bullet.Value.Position.Y == tank.Value.Position.Y)
+                            && (bullet.Key != tank.Key))
+                        {
+                            tank.Value.Tank.HPImprove((-1) * bullet.Value.Bullet.GetDamage());
 
-                                    //  delete bullet from the map
-                                    Visualizer.Render(' ', bullet.Current.Value.Position.X, bullet.Current.Value.Position.Y, System.Console.BackgroundColor);
-
-                                    bulletsCollection.Remove(bullet.Current.Key);
-                                }
-
-                            }
-
-                            //  change the bullet position and render it
-                            //**
                             //  delete bullet from the map
-                            Visualizer.Render(' ', bullet.Current.Value.Position.X, bullet.Current.Value.Position.Y, System.Console.BackgroundColor);
-                            BulletOnMap tmp = bullet.Current.Value;
+                            Visualizer.Render(' ', bullet.Value.Position.X, bullet.Value.Position.Y, System.Console.BackgroundColor);
 
-                            switch (bullet.Current.Value.Bullet.GetDirection())
-                            {
+                            toDelete.Add(bullet.Value);
+                        }
 
-                                case Directions.Down:
-                                    {
-                                        tmp.Position.Y--; break;
-                                    }
-                                case Directions.Up:
-                                    {
-                                        tmp.Position.Y++; break;
-                                    }
-                                case Directions.Right:
-                                    {
-                                        tmp.Position.X++; break;
-                                    }
-                                case Directions.Left:
-                                    {
-                                        tmp.Position.X--; break;
-                                    }
-
-                            }
-
-
-                            bulletsCollection[bullet.Current.Key] = tmp;
-
-                            Visualizer.Render(tmp.Bullet.GetSkin(), bullet.Current.Value.Position.X, bullet.Current.Value.Position.Y, System.Console.BackgroundColor);
-                            //**
-
-
-
-
-                            //  chech if bullet intersects with a wall
-                            //  if true then remove
-                            if (!map.IsEmpty(bullet.Current.Value.Position.X, bullet.Current.Value.Position.Y))
-                            {
-                                //  delete bullet from the map
-                                Visualizer.Render(' ', bullet.Current.Value.Position.X, bullet.Current.Value.Position.Y, System.Console.BackgroundColor);
-                                bulletsCollection.Remove(bullet.Current.Key);
-                            }
-
-                       
                     }
-                });
+
+                    
+                    
+                    //  delete bullet from the map
+                    Visualizer.Render(' ', bullet.Value.Position.X, bullet.Value.Position.Y, System.Console.BackgroundColor);
+
+                    //  object to change
+                    BulletOnMap tmp = bullet.Value;
+
+                    switch (bullet.Value.Bullet.GetDirection())
+                    {
+
+                        case Directions.Down:
+                            {
+                                tmp.Position.Y--; break;
+                            }
+                        case Directions.Up:
+                            {
+                                tmp.Position.Y++; break;
+                            }
+                        case Directions.Right:
+                            {
+                                tmp.Position.X++; break;
+                            }
+                        case Directions.Left:
+                            {
+                                tmp.Position.X--; break;
+                            }
+
+                    }
+
+                    toChange.Add(tmp);
+                    
+
+
+
+
+                    //  chech if bullet intersects with a wall
+                    //  if true then remove
+                    if (!map.IsEmpty(bullet.Value.Position.X, bullet.Value.Position.Y))
+                    {
+                        //  delete bullet from the map
+                        Visualizer.Render(' ', bullet.Value.Position.X, bullet.Value.Position.Y, System.Console.BackgroundColor);
+                        toDelete.Add(bullet.Value);
+                    }
+
+
+                }
+
+                //  remove all bullets from toDelete list
+                foreach (var remove in toDelete)
+                {
+                    bulletsCollection.Remove(remove.Bullet.GetHashCode());
+                }
+
+                //  change bullets
+                foreach(var change in toChange)
+                {
+                    bulletsCollection[change.Bullet.GetHashCode()] = change;
+                    Visualizer.Render(change.Bullet.GetSkin(), change.Position.X, change.Position.Y, System.ConsoleColor.Green);
+                }
 
             }
 
         }
+
 
         #endregion
 

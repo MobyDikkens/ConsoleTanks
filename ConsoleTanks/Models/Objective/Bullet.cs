@@ -27,7 +27,7 @@ namespace ConsoleTanks.Models.Objective
             this.direction = direction;
             this.skin = skin;
         }
-
+        
         public override int GetHashCode()
         {
             return this.id;
