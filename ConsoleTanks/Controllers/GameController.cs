@@ -130,18 +130,14 @@ namespace ConsoleTanks.Controllers
                         {
                             tank.Value.Tank.HPImprove((-1) * bullet.Value.Bullet.GetDamage());
 
-                            //  delete bullet from the map
-                            Visualizer.Render(' ', bullet.Value.Position.X, bullet.Value.Position.Y, System.Console.BackgroundColor);
 
                             toDelete.Add(bullet.Value);
                         }
 
                     }
 
-                    
-                    
-                    //  delete bullet from the map
-                    Visualizer.Render(' ', bullet.Value.Position.X, bullet.Value.Position.Y, System.Console.BackgroundColor);
+                    //  delete current position and change it to the new
+                    toDelete.Add(bullet.Value);
 
                     //  object to change
                     BulletOnMap tmp = bullet.Value;
@@ -168,7 +164,7 @@ namespace ConsoleTanks.Controllers
 
                     }
 
-                    toChange.Add(tmp);
+                   
                     
 
 
@@ -176,12 +172,22 @@ namespace ConsoleTanks.Controllers
 
                     //  chech if bullet intersects with a wall
                     //  if true then remove
-                    if (!map.IsEmpty(bullet.Value.Position.X, bullet.Value.Position.Y))
+                    if (map.IsEmpty(tmp.Position.X, tmp.Position.Y))
+                    {
+                        //  intersect bounds
+                        if (map.xLenth > tmp.Position.X && map.yLenth > tmp.Position.Y
+                            && tmp.Position.X >= 0 && tmp.Position.Y >= 0)
+                        {
+                            toChange.Add(tmp);
+                        }
+                    }
+                    else
                     {
                         //  delete bullet from the map
-                        Visualizer.Render(' ', bullet.Value.Position.X, bullet.Value.Position.Y, System.Console.BackgroundColor);
                         toDelete.Add(bullet.Value);
                     }
+
+                   
 
 
                 }
@@ -189,7 +195,11 @@ namespace ConsoleTanks.Controllers
                 //  remove all bullets from toDelete list
                 foreach (var remove in toDelete)
                 {
-                    bulletsCollection.Remove(remove.Bullet.GetHashCode());
+                    if(bulletsCollection.Remove(remove.Bullet.GetHashCode()))
+                    {
+                        //  delete bullet from the map
+                        Visualizer.Render(' ', remove.Position.X, remove.Position.Y, System.Console.BackgroundColor);
+                    }
                 }
 
                 //  change bullets

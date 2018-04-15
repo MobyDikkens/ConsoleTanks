@@ -87,7 +87,7 @@ namespace ConsoleTanks.Controllers
                     if (current == previous)
                     {
 
-                        if (duration >= 3)
+                        if (duration >= 2)
                             {
                             if(EqualsKey(current))
                             {

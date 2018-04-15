@@ -14,7 +14,7 @@ namespace ConsoleTanks.Models.Abstract
     {
         private int hp = 0;
 
-        private char skin = '^';
+        private char skin = '▲';
 
         private Directions direction = Directions.Up;
 
@@ -107,6 +107,7 @@ namespace ConsoleTanks.Models.Abstract
             if (this.Moved != null)
             {
                 this.direction = Directions.Down;
+                this.skin = '▲';
                 Moved(this, Directions.Down);
             }
         }
@@ -115,6 +116,7 @@ namespace ConsoleTanks.Models.Abstract
         {
             if (this.Moved != null)
             {
+                this.skin = '◄';
                 this.direction = Directions.Left;
                 Moved(this, Directions.Left);
             }
@@ -124,6 +126,7 @@ namespace ConsoleTanks.Models.Abstract
         {
             if (this.Moved != null)
             {
+                this.skin = '►';
                 this.direction = Directions.Right;
                 Moved(this, Directions.Right);
             }
@@ -133,6 +136,7 @@ namespace ConsoleTanks.Models.Abstract
         {
             if (this.Moved != null)
             {
+                this.skin = '▼';
                 this.direction = Directions.Up;
                 Moved(this, Directions.Up);
             }
@@ -146,4 +150,6 @@ namespace ConsoleTanks.Models.Abstract
         #endregion
 
     }
+
+
 }
