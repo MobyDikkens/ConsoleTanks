@@ -6,6 +6,7 @@
 
 
 using ConsoleTanks.Behavior;
+using System;
 
 namespace ConsoleTanks.Models.Objective
 {
@@ -19,13 +20,16 @@ namespace ConsoleTanks.Models.Objective
 
         private char skin = '*';
 
+        private ConsoleColor color;
 
-        public Bullet(int id, int damage, char skin, Directions direction)
+
+        public Bullet(int id, int damage, char skin, Directions direction, ConsoleColor color)
         {
             this.id = id;
             this.damage = damage;
             this.direction = direction;
             this.skin = skin;
+            this.color = color;
         }
         
         public override int GetHashCode()
@@ -48,5 +52,9 @@ namespace ConsoleTanks.Models.Objective
             return this.skin;
         }
 
+        public ConsoleColor GetColor()
+        {
+            return this.color;
+        }
     }
 }

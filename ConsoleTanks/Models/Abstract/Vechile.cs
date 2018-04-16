@@ -18,10 +18,17 @@ namespace ConsoleTanks.Models.Abstract
 
         private Directions direction = Directions.Up;
 
+        private ConsoleColor color;
+
 
         public char GetSkin()
         {
             return this.skin;
+        }
+
+        public ConsoleColor GetColor()
+        {
+            return this.color;
         }
 
 
@@ -34,9 +41,10 @@ namespace ConsoleTanks.Models.Abstract
             this.HPChanged = null;
             this.direction = Directions.Up;
             this.Moved = null;
+            this.color = ConsoleColor.DarkGray;
         }
 
-        public Vechile(int hp, char skin)
+        public Vechile(int hp, char skin, ConsoleColor color)
         {
             if((hp > 0) && (skin != ' '))
             {
@@ -45,6 +53,7 @@ namespace ConsoleTanks.Models.Abstract
                 this.HPChanged = null;
                 this.direction = Directions.Up;
                 this.Moved = null;
+                this.color = color;
             }
             else
             {
@@ -53,6 +62,7 @@ namespace ConsoleTanks.Models.Abstract
                 this.HPChanged = null;
                 this.direction = Directions.Up;
                 this.Moved = null;
+                this.color = color;
             }
         }
 

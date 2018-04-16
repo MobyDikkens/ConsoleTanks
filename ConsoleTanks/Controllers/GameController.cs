@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using ConsoleTanks.Behavior;
 using System.Timers;
 using System.Threading.Tasks;
-
+using System;
 
 namespace ConsoleTanks.Controllers
 {
@@ -52,7 +52,7 @@ namespace ConsoleTanks.Controllers
             {
                 this.tanksCollection = new Dictionary<int, TankOnMap>();
                 this.bulletsCollection = new Dictionary<int, BulletOnMap>();
-                this.map = new Map(xLenth, yLenth, wall);
+                this.map = new Map(xLenth, yLenth, wall, ConsoleColor.DarkGray);
 
 
                 timer = new Timer(41);//24 fps
@@ -64,7 +64,7 @@ namespace ConsoleTanks.Controllers
             {
                 this.tanksCollection = new Dictionary<int, TankOnMap>();
                 this.bulletsCollection = new Dictionary<int, BulletOnMap>();
-                this.map = new Map(20, 20, '*');
+                this.map = new Map(20, 20, '*',ConsoleColor.DarkGray);
 
                 timer = new Timer(36);//24 fps
                 timer.AutoReset = true;
@@ -72,7 +72,7 @@ namespace ConsoleTanks.Controllers
             }
 
             
-            Visualizer.Render(map.GetMap(), map.xLenth, map.yLenth, System.ConsoleColor.Red);
+            Visualizer.Render(map.GetMap(), map.xLenth, map.yLenth, map.GetColor());
         }
 
 
@@ -206,7 +206,7 @@ namespace ConsoleTanks.Controllers
                 foreach(var change in toChange)
                 {
                     bulletsCollection[change.Bullet.GetHashCode()] = change;
-                    Visualizer.Render(change.Bullet.GetSkin(), change.Position.X, change.Position.Y, System.ConsoleColor.Green);
+                    Visualizer.Render(change.Bullet.GetSkin(), change.Position.X, change.Position.Y, change.Bullet.GetColor());
                 }
 
             }
@@ -218,7 +218,7 @@ namespace ConsoleTanks.Controllers
 
         #region Methods
 
-        public bool AddPlayer(int damage, char bulletSkin, int hp, char skin, 
+        public bool AddPlayer(int damage, char bulletSkin, int hp, char skin, ConsoleColor color,
             System.ConsoleKey foreward, System.ConsoleKey backward, System.ConsoleKey left,
             System.ConsoleKey right, System.ConsoleKey shout)
         {
@@ -226,7 +226,7 @@ namespace ConsoleTanks.Controllers
             {
                 TankOnMap newTank = new TankOnMap();
                 int guid = this.GUID;
-                newTank.Tank = new Tank(guid, damage, bulletSkin, hp, skin);
+                newTank.Tank = new Tank(guid, damage, bulletSkin, hp, skin, color);
 
 
                 //  find an empty place on the map
@@ -376,7 +376,7 @@ namespace ConsoleTanks.Controllers
                                         //  Delete old position from map
                                         Visualizer.Render(' ', tmp.Position.X, tmp.Position.Y, System.Console.BackgroundColor);
                                         //  Add new position
-                                        Visualizer.Render(newValue.Tank.GetSkin(), newValue.Position.X, newValue.Position.Y, System.ConsoleColor.Green);
+                                        Visualizer.Render(newValue.Tank.GetSkin(), newValue.Position.X, newValue.Position.Y, newValue.Tank.GetColor());
 
 
                                         tanksCollection[tmp.Tank.GetHashCode()] = newValue;

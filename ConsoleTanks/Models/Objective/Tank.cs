@@ -22,6 +22,7 @@ namespace ConsoleTanks.Models.Objective
 
         private DateTime lastFire = DateTime.Now;
 
+
         public event EventHandler<Bullet> OnShot = null;
 
         public override int GetHashCode()
@@ -29,7 +30,7 @@ namespace ConsoleTanks.Models.Objective
             return this.id;
         }
 
-        public Tank(int id, int damage, char bulletSkin,int hp, char skin) : base(hp,skin)
+        public Tank(int id, int damage, char bulletSkin,int hp, char skin, ConsoleColor color) : base(hp,skin, color)
         {
             if(bulletSkin != ' ')
             {
@@ -55,10 +56,10 @@ namespace ConsoleTanks.Models.Objective
             {
                 TimeSpan delta = DateTime.Now - lastFire;
 
-                if (delta.Milliseconds >= 5)
+                if (delta.Milliseconds >= 15)
                 {
 
-                    Bullet bullet = new Bullet(this.id, this.damage, this.bulletSkin, this.GetCurrentDirection());
+                    Bullet bullet = new Bullet(this.id, this.damage, this.bulletSkin, this.GetCurrentDirection(), this.GetColor());
                     OnShot(this, bullet);
                 }
             }
